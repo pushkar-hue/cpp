@@ -5,6 +5,38 @@
 
 namespace py = pybind11;
 typedef std::vector<std::vector<float>> Matrix;
+typedef std::vector<float> Vector;
+
+struct matrix2d
+{
+    std::vector<float> v_;
+    size_t x_, y_;
+	matrix2d(std::vector<float> v, size_t x, size_t y) : v_(v), x_(x), y_(y) {}
+};
+
+Matrix matrix_multiply_flatten(const matrix2d &m1, const matrix2d &m2)
+{
+    if (m1.x_ != m2.y_) {
+        throw std::invalid_argument("Incompatible matrix dimensions.");
+    }
+    
+    Matrix result(m1.y_, std::vector<float>(m2.x_, 0.0f));
+
+    for (size_t i = 0; i < m1.y_; i++) {
+        for (size_t k = 0; k < m1.x_; k++) {
+            // Grab the element from m1 once for the entire J loop
+            float val1 = m1.v_[i * m1.x_ + k];
+            
+            for (size_t j = 0; j < m2.x_; j++) {
+                // We add to the result row incrementally
+                // This accesses result[i][j] and m2.v_[...] linearly!
+                result[i][j] += val1 * m2.v_[k * m2.x_ + j];
+            }
+        }
+    }
+    return result;
+}
+
 
 
 Matrix createMatrix(int n){
@@ -160,6 +192,14 @@ PYBIND11_MODULE(calculator_api, m, py::mod_gil_not_used()) {
 	m.def("createMatrix", &createMatrix, "A function that creates an n x n matrix initialized to zero");
 	m.def("addMatrices", &addMatrices, "A function that adds two matrices");
 	m.def("subtractMatrices", &subtractMatrices, "A function that subtracts two matrices");
+
+	m.def("matrix_multiply_flatten", &matrix_multiply_flatten, 
+      "A function that multiplies two flattened matrices");
+	py::class_<matrix2d>(m, "matrix2d")
+    .def(py::init<std::vector<float>, size_t, size_t>()) // You'd need a constructor
+    .def_readwrite("v_", &matrix2d::v_)
+    .def_readwrite("x_", &matrix2d::x_)
+    .def_readwrite("y_", &matrix2d::y_);
 
 }
 

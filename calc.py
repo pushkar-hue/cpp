@@ -36,7 +36,7 @@ print(f"Added: {new_val}")
 # print(f"Matrix multiplication result: {result}")
 
 
-size = 256
+size = 128
 A = [[random.random() for _ in range(size)] for _ in range(size)]
 B = [[random.random() for _ in range(size)] for _ in range(size)]
 
@@ -53,8 +53,10 @@ cpp_time = timeit.timeit(
     number=iterations
 )
 
+C, D = np.array(A), np.array(B)
+
 numpy_time = timeit.timeit(
-    lambda: np.matmul(np.array(A), np.array(B)), 
+    lambda: np.matmul(C, D), 
     number=iterations
 )
 
@@ -63,9 +65,20 @@ strassen_time = timeit.timeit(
     number=iterations
 )
 
+mat2d_A = my_math_api.matrix2d([elem for row in A for elem in row], size, size)
+mat2d_B = my_math_api.matrix2d([elem for row in B for elem in row], size, size)
+
+flatten_time = timeit.timeit(
+    lambda: my_math_api.matrix_multiply_flatten(mat2d_A, mat2d_B), 
+    number=iterations
+)
+print(f"\nFlattened C++ matrix multiplication time: {flatten_time:.6f} seconds")
 print(f"Python matrix multiplication time: {py_time:.6f} seconds")
 print(f"C++ matrix multiplication time: {cpp_time:.6f} seconds")
 print(f"NumPy matrix multiplication time: {numpy_time:.6f} seconds")
+
+
+print("\nPerformance Comparison:")
 
 if py_time < cpp_time:
     print(f"Python implementation is faster by {cpp_time / py_time:.2f}x")
@@ -97,3 +110,14 @@ if strassen_time < numpy_time:
     print(f"Strassen's C++ implementation is faster then NumPy by {numpy_time / strassen_time:.2f}x")
 else:
     print(f"NumPy implementation is faster by {strassen_time / numpy_time:.2f}x")
+
+
+if flatten_time < cpp_time:
+    print(f"Flattened C++ implementation is faster then standard C++ by {cpp_time / flatten_time:.2f}x")
+else:
+    print(f"Standard C++ implementation is faster by {flatten_time / cpp_time:.2f}x")
+
+if flatten_time < numpy_time:
+    print(f"Flattened C++ implementation is faster then NumPy by {numpy_time / flatten_time:.2f}x")
+else:
+    print(f"NumPy implementation is faster by {flatten_time / numpy_time:.2f}x")
