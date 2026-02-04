@@ -1,0 +1,7 @@
+README.md
+ptr.cpp
+setup.py
+calculator_api.egg-info/PKG-INFO
+calculator_api.egg-info/SOURCES.txt
+calculator_api.egg-info/dependency_links.txt
+calculator_api.egg-info/top_level.txt

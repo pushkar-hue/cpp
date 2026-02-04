@@ -72,52 +72,44 @@ flatten_time = timeit.timeit(
     lambda: my_math_api.matrix_multiply_flatten(mat2d_A, mat2d_B), 
     number=iterations
 )
+
+strassen_matrix_view_time = timeit.timeit(
+    lambda: my_math_api.strassen_entry(A, B), 
+    number=iterations
+)
+
+
+
+
 print(f"\nFlattened C++ matrix multiplication time: {flatten_time:.6f} seconds")
 print(f"Python matrix multiplication time: {py_time:.6f} seconds")
 print(f"C++ matrix multiplication time: {cpp_time:.6f} seconds")
 print(f"NumPy matrix multiplication time: {numpy_time:.6f} seconds")
+print(f"Strassen's C++ matrix multiplication time: {strassen_time:.6f} seconds")
+print(f"Strassen's C++ matrix multiplication with views time: {strassen_matrix_view_time:.6f} seconds")
+
+
+def print_comparison(name1, time1, name2, time2):
+    if time2 == 0: return # Avoid div by zero
+    ratio = time1 / time2
+    if ratio > 1:
+        print(f"{name2} is {ratio:.2f}x faster than {name1}")
+    else:
+        print(f"{name1} is {1/ratio:.2f}x faster than {name2}")
+
+
 
 
 print("\nPerformance Comparison:")
 
-if py_time < cpp_time:
-    print(f"Python implementation is faster by {cpp_time / py_time:.2f}x")
-
-else:
-    print(f"C++ implementation is faster by {py_time / cpp_time:.2f}x")
-
-
-if numpy_time < cpp_time:
-    print(f"NumPy implementation is faster then cpp by {cpp_time / numpy_time:.2f}x")
-else:
-    print(f"C++ implementation is faster by {numpy_time / cpp_time:.2f}x")
-
-if numpy_time < py_time:
-    print(f"NumPy implementation is faster then python by {py_time / numpy_time:.2f}x")
-else:
-    print(f"Python implementation is faster by {numpy_time / py_time:.2f}x")
-
-
-print("\nStrassen's Matrix Multiplication:")
-print(f"Strassen's C++ matrix multiplication time: {strassen_time:.6f} seconds")
-
-if strassen_time < cpp_time:
-    print(f"Strassen's C++ implementation is faster then standard C++ by {cpp_time / strassen_time:.2f}x")
-else:
-    print(f"Standard C++ implementation is faster by {strassen_time / cpp_time:.2f}x")
-
-if strassen_time < numpy_time:
-    print(f"Strassen's C++ implementation is faster then NumPy by {numpy_time / strassen_time:.2f}x")
-else:
-    print(f"NumPy implementation is faster by {strassen_time / numpy_time:.2f}x")
-
-
-if flatten_time < cpp_time:
-    print(f"Flattened C++ implementation is faster then standard C++ by {cpp_time / flatten_time:.2f}x")
-else:
-    print(f"Standard C++ implementation is faster by {flatten_time / cpp_time:.2f}x")
-
-if flatten_time < numpy_time:
-    print(f"Flattened C++ implementation is faster then NumPy by {numpy_time / flatten_time:.2f}x")
-else:
-    print(f"NumPy implementation is faster by {flatten_time / numpy_time:.2f}x")
+print_comparison("Python", py_time, "C++", cpp_time)
+print_comparison("NumPy", numpy_time, "C++", cpp_time)
+print_comparison("NumPy", numpy_time, "Python", py_time)
+print_comparison("Strassen's C++", strassen_time, "C++", cpp_time)
+print_comparison("Strassen's C++", strassen_time, "NumPy", numpy_time)
+print_comparison("Flattened C++", flatten_time, "C++", cpp_time)
+print_comparison("Flattened C++", flatten_time, "NumPy", numpy_time)
+print_comparison("Strassen's C++ with views", strassen_matrix_view_time, "C++", cpp_time)
+print_comparison("Strassen's C++ with views", strassen_matrix_view_time, "NumPy", numpy_time)
+print_comparison("Strassen's C++ with views", strassen_matrix_view_time, "Strassen's C++", strassen_time)
+print_comparison("Strassen's C++ with views", strassen_matrix_view_time, "Python", py_time)
